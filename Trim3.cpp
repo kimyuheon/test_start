@@ -38,58 +38,7 @@ void trimArcSegment(AcGePoint2d start, AcGePoint2d end, double bulge, AcGePoint2
     double startAngle = atan2(start.y - center.y, start.x - center.x);
     double endAngle = atan2(end.y - center.y, end.x - center.x);
 
-    // #include "dbents.h"
-#include "geassign.h"
-#include "gepnt3d.h"
-#include "gearc3d.h"
-#include <cmath>
-
-// 중심과 반지름 계산 함수
-void calculateArcCenterAndRadius(const AcGePoint2d& start, const AcGePoint2d& end, double bulge, AcGePoint2d& center, double& radius)
-{
-    double theta = atan(bulge) * 4.0; // 중심각
-    double chordLength = start.distanceTo(end);
-    radius = chordLength / (2 * sin(theta / 2));
-
-    // 호의 중심 계산
-    AcGeVector2d chordVector = end - start;
-    AcGeVector2d normalVector(-chordVector.y, chordVector.x);
-    normalVector.normalize();
-
-    double sagitta = radius * (1 - cos(theta / 2));
-    center = start + chordVector / 2 + normalVector * (bulge > 0 ? sagitta : -sagitta);
-}
-
-// 새로운 `bulge` 계산 함수
-double calculateNewBulge(double startAngle, double endAngle)
-{
-    double theta = endAngle - startAngle;
-    return tan(theta / 4.0);
-}
-
-// 호의 중간 부분을 처리하여 새로운 세그먼트를 추가
-void trimArcSegment(AcGePoint2d start, AcGePoint2d end, double bulge, AcGePoint2d trimStart, AcGePoint2d trimEnd, AcDbPolyline* pNewPolyline)
-{
-    AcGePoint2d center;
-    double radius;
-    calculateArcCenterAndRadius(start, end, bulge, center, radius);
-
-    // 시작 각도와 끝 각도 계산
-    double startAngle = atan2(start.y - center.y, start.x - center.x);
-    double endAngle = atan2(end.y - center.y, end.x - center.x);
-
     // Trim 지점의 각도 계산
-    double trimStartAngle = atan2(trimStart.y - center.y, trimStart.x - center.x);
-    double trimEndAngle = atan2(trimEnd.y - center.y, trimEnd.x - center.x);
-
-    // 새로운 `bulge` 값 계산
-    double newBulge = calculateNewBulge(trimStartAngle, trimEndAngle);
-
-    // 새로운 호 세그먼트 추가
-    int index = pNewPolyline->numVerts();
-    pNewPolyline->addVertexAt(index, trimStart, newBulge);
-    pNewPolyline->addVertexAt(index + 1, trimEnd);
-} 지점의 각도 계산
     double trimStartAngle = atan2(trimStart.y - center.y, trimStart.x - center.x);
     double trimEndAngle = atan2(trimEnd.y - center.y, trimEnd.x - center.x);
 
